@@ -9,7 +9,8 @@ use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-
+use  App\Models\pointages;
+use App\Models\demandeConges;
 #[Fillable(['name', 'email', 'password'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
@@ -29,4 +30,11 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+    // app/Models/User.php
+public function pointages() {
+    return $this->hasMany(Pointages::class);
+}
+public function demandesConges() {
+    return $this->hasMany(DemandeConges::class);
+}
 }
