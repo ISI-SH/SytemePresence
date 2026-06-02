@@ -11,7 +11,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use  App\Models\pointages;
 use App\Models\demandeConges;
-#[Fillable(['name', 'email', 'password'])]
+#[Fillable(['name', 'email', 'password', 'role', 'is_active', 'phone', 'hire_date', 'photo'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
@@ -28,11 +28,12 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'hire_date' => 'date',
         ];
     }
     // app/Models/User.php
 public function pointages() {
-    return $this->hasMany(Pointages::class);
+    return $this->hasMany(Pointage::class);
 }
 public function demandesConges() {
     return $this->hasMany(DemandeConges::class);

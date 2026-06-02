@@ -1,15 +1,12 @@
 <?php
 
 namespace App\Http\Controllers;
-use Illuminate\Support\Facades\DB;
+
 use Illuminate\Http\Request;
-use RecursiveDirectoryIterator;
+use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
         return view('auth.login');
@@ -17,67 +14,34 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
-        $email = $request->input('email');
-        $password = $request->input('password');
+        $credentials = $request->validate([
+            'email' => ['required', 'email'],
+            'password' => ['required'],
+        ]);
 
-        $user = DB::table('users')->where('email','=' , $email)->where('password','=', $password)->get();
-    //print_r(count($user));
-        if (count($user)) {
-
-          //  $request->session()->put('user', $request->email);
-           // $request->session()->put('priv', $user[0]->privilege);
-    //dd($request->session()->get('user'));
-            return view('welcome');
-            //->with(['user' => $request->session()->get('user')])->with('priv', $request->session()->get('priv'))->with('success', 'Login successful. Welcome, ' . $user[0]->name . ' !');
-        } else {
-            return redirect()->back()->with(['success' => 'Invalid email or password']);
+        if (Auth::attempt($credentials)) {
+            $request->session()->regenerate();
+            
+            // Rediriger selon le rôle de l'utilisateur
+            if (Auth::user()->role === 'admin') {
+                return redirect()->intended(route('admin.dashboard'));
+            } else {
+                return redirect()->intended('/'); // Pour les employés, rediriger vers la page d'accueil
+            }
         }
-    }
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
+
+        return back()->withErrors([
+            'email' => 'Les identifiants fournis ne correspondent pas à nos enregistrements.',
+        ]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function logout(Request $request)
     {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        Auth::logout();
+        
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+        
+        return redirect('/login');
     }
 }
