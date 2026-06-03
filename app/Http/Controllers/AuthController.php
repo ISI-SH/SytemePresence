@@ -1,15 +1,12 @@
 <?php
 
 namespace App\Http\Controllers;
-use Illuminate\Support\Facades\DB;
+
 use Illuminate\Http\Request;
-use RecursiveDirectoryIterator;
+use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
         return view('auth.login');
@@ -21,10 +18,14 @@ class AuthController extends Controller
         $password = $request->input('password');
 
         $user = DB::table('users')->where('email','=' , $email)->where('password','=', $password)->get();
-
+    //print_r(count($user));
         if (count($user)) {
 
+          //  $request->session()->put('user', $request->email);
+           // $request->session()->put('priv', $user[0]->privilege);
+    //dd($request->session()->get('user'));
             return view('welcome');
+            //->with(['user' => $request->session()->get('user')])->with('priv', $request->session()->get('priv'))->with('success', 'Login successful. Welcome, ' . $user[0]->name . ' !');
         } else {
             return redirect()->back()->with(['success' => 'Invalid email or password']);
         }
@@ -66,14 +67,11 @@ class AuthController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
-    }
+        Auth::logout();
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect('/login');
     }
 }
