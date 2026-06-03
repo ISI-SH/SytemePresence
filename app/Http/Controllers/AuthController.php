@@ -21,14 +21,10 @@ class AuthController extends Controller
         $password = $request->input('password');
 
         $user = DB::table('users')->where('email','=' , $email)->where('password','=', $password)->get();
-    //print_r(count($user));
+
         if (count($user)) {
 
-          //  $request->session()->put('user', $request->email);
-           // $request->session()->put('priv', $user[0]->privilege);
-    //dd($request->session()->get('user'));
             return view('welcome');
-            //->with(['user' => $request->session()->get('user')])->with('priv', $request->session()->get('priv'))->with('success', 'Login successful. Welcome, ' . $user[0]->name . ' !');
         } else {
             return redirect()->back()->with(['success' => 'Invalid email or password']);
         }
