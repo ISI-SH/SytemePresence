@@ -8,12 +8,43 @@ use App\Models\Pointage;
 use App\Models\QrCode;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Config;
 
 class DashboardController extends Controller
 {
+    /**
+     * Déterminer si un employé est en retard basé sur l'heure fixe
+     */
+    private function isLate($checkInTime)
+    {
+        $fixedArrivalTime = Config::get('attendance.fixed_arrival_time', '09:00');
+        $toleranceMinutes = (int) Config::get('attendance.late_tolerance_minutes', 15);
+        
+        $fixedTime = Carbon::parse($fixedArrivalTime);
+        $checkIn = Carbon::parse($checkInTime);
+        
+        $fixedTime->addMinutes($toleranceMinutes);
+        
+        // Comparer seulement les heures, pas les dates
+        $fixedTimeMinutes = $fixedTime->hour * 60 + $fixedTime->minute;
+        $checkInMinutes = $checkIn->hour * 60 + $checkIn->minute;
+        
+        return $checkInMinutes > $fixedTimeMinutes;
+    }
+    
     public function index()
     {
         $today = Carbon::today();
+
+        // --- Recalculer les statuts basés sur l'heure fixe -------------------
+        $pointagesToday = Pointage::whereDate('check_in', $today)->get();
+        foreach ($pointagesToday as $pointage) {
+            $newStatus = $this->isLate($pointage->check_in) ? 'En retard' : 'Présent';
+            if ($pointage->status !== $newStatus) {
+                $pointage->status = $newStatus;
+                $pointage->save();
+            }
+        }
 
         // --- 4 cartes stats -------------------------------------------------
         $presentCount = Pointage::whereDate('check_in', $today)
