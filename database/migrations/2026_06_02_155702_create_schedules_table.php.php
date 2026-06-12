@@ -1,0 +1,19 @@
+<?php
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration {
+    public function up(): void {
+        Schema::create('schedules', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('department_id')->constrained()->cascadeOnDelete();
+            $table->time('start_time');
+            $table->time('end_time');
+            $table->unsignedSmallInteger('tolerance_minutes')->default(10);
+            $table->tinyInteger('day_of_week')->nullable();
+            $table->timestamps();
+        });
+    }
+    public function down(): void { Schema::dropIfExists('schedules'); }
+};
