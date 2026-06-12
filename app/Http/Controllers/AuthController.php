@@ -14,21 +14,25 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
-        $email = $request->input('email');
-        $password = $request->input('password');
+        $credentials = $request->validate([
+            'email' => ['required', 'email'],
+            'password' => ['required'],
+        ]);
 
-        $user = DB::table('users')->where('email','=' , $email)->where('password','=', $password)->get();
-    //print_r(count($user));
-        if (count($user)) {
+        if (Auth::attempt($credentials)) {
+            $request->session()->regenerate();
 
-          //  $request->session()->put('user', $request->email);
-           // $request->session()->put('priv', $user[0]->privilege);
-    //dd($request->session()->get('user'));
-            return view('welcome');
-            //->with(['user' => $request->session()->get('user')])->with('priv', $request->session()->get('priv'))->with('success', 'Login successful. Welcome, ' . $user[0]->name . ' !');
-        } else {
-            return redirect()->back()->with(['success' => 'Invalid email or password']);
+            // Rediriger selon le rôle de l'utilisateur
+            if (Auth::user()->role === 'admin') {
+                return redirect()->intended(route('admin.dashboard'));
+            } else {
+                return redirect()->intended('/'); // Pour les employés, rediriger vers la page d'accueil
+            }
         }
+
+        return back()->withErrors([
+            'email' => 'Les identifiants fournis ne correspondent pas à nos enregistrements.',
+        ]);
     }
     /**
      * Show the form for creating a new resource.
@@ -65,6 +69,8 @@ class AuthController extends Controller
     /**
      * Update the specified resource in storage.
      */
+
+
     public function update(Request $request, string $id)
     {
         Auth::logout();
@@ -74,4 +80,5 @@ class AuthController extends Controller
 
         return redirect('/login');
     }
+
 }
