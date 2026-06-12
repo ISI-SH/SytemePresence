@@ -4,7 +4,11 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration {
-    public function up(): void {
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
             $table->string('name');
@@ -14,7 +18,7 @@ return new class extends Migration {
             $table->foreignId('department_id')->nullable()->constrained()->nullOnDelete();
             $table->boolean('is_active')->default(true);
             $table->rememberToken();
-            $table->timestamps();
+            $table->timestamps(); 
         });
     }
     public function down(): void { Schema::dropIfExists('users'); }
