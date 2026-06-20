@@ -75,8 +75,8 @@ class UserSeeder extends Seeder
                 'hire_date' => '2024-06-01',
             ],
             [
-                'name' => 'Samuel Tchiblintete',
-                'email' => 'samuel@gmail.com',
+                'name' => 'Samuel TCHABLINTETE',
+                'email' => 'samuel@gmail.com',  
                 'password' => Hash::make('password'),
                 'role' => 'employe',
                 'is_active' => false,

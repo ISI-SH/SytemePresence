@@ -14,7 +14,14 @@ class DashboardController extends Controller {
     public function index() {
         $user            = Auth::user()->load('department.schedules');
         $todayAttendance = $user->todayAttendance();
-        $schedule        = $user->department?->todaySchedule();
+        $schedule = $user->department?->todaySchedule();
+        if (!$schedule) {
+            $schedule = (object) [
+                'start_time'          => config('attendance.fixed_arrival_time', '09:00'),
+                'end_time'            => config('attendance.work_end_time', '17:00'),
+                'tolerance_minutes'   => (int) config('attendance.late_tolerance_minutes', 15),
+            ];
+        }
         $hasToken        = DailyToken::today() !== null;
         $history         = $user->attendances()->orderBy('date', 'desc')->limit(30)->get();
         $monthStats      = $user->attendances()
