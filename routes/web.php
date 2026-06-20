@@ -16,6 +16,7 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 // Routes Admin
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
+    Route::get('/qr/current', [AdminDashboardController::class, 'currentQr'])->name('qr.current');
 
     Route::prefix('employes')->name('employes.')->group(function () {
         Route::get('/', [EmployeeController::class, 'index'])->name('index');

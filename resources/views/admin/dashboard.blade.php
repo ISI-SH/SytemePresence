@@ -117,20 +117,23 @@
             <!-- QR Code actif -->
             <div class="bg-white overflow-hidden shadow rounded-lg">
                 <div class="p-5">
-                    <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">QR Code actif du jour</h3>
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg leading-6 font-medium text-gray-900">QR Code de pointage</h3>
+                        <span id="qr-countdown" class="text-xs font-mono text-indigo-600 bg-indigo-50 px-2 py-1 rounded"></span>
+                    </div>
                     @if($qrCode)
                         <div class="flex items-center justify-center">
                             <div class="text-center">
                                 <div class="bg-white p-4 border-2 border-gray-300 rounded-lg inline-block">
-                                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data={{ $qrCode->token }}" alt="QR Code" class="w-48 h-48">
+                                    <img id="admin-qr-image" src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data={{ $qrCode->token }}" alt="QR Code" class="w-48 h-48">
                                 </div>
-                                <p class="text-sm text-gray-600 mt-4">Token: {{ $qrCode->token }}</p>
-                                <p class="text-sm text-gray-500">Expire: {{ $qrCode->expires_at->format('H:i') }}</p>
+                                <p class="text-xs text-gray-500 mt-3">Renouvelé chaque minute · valable pour arrivée et départ</p>
+                                <p id="qr-expires-label" class="text-sm text-gray-500 mt-1">Expire à {{ $qrCode->expires_at->format('H:i:s') }}</p>
                             </div>
                         </div>
                     @else
                         <div class="text-center text-gray-500">
-                            <p>Aucun QR code actif pour aujourd'hui</p>
+                            <p>Aucun QR code actif</p>
                         </div>
                     @endif
                 </div>
@@ -190,5 +193,41 @@
             }
         }
     });
+</script>
+<script>
+(function () {
+    const qrImage = document.getElementById('admin-qr-image');
+    const countdown = document.getElementById('qr-countdown');
+    const expiresLabel = document.getElementById('qr-expires-label');
+    if (!qrImage) return;
+
+    let secondsLeft = {{ $qrCode?->secondsUntilExpiry() ?? 0 }};
+
+    function updateCountdown() {
+        if (!countdown) return;
+        countdown.textContent = secondsLeft > 0 ? 'Nouveau QR dans ' + secondsLeft + 's' : 'Mise à jour…';
+        if (secondsLeft > 0) secondsLeft--;
+    }
+
+    async function refreshQr() {
+        try {
+            const res = await fetch('{{ route('admin.qr.current') }}', {
+                headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
+            });
+            if (!res.ok) return;
+            const data = await res.json();
+            qrImage.src = data.qr_url;
+            secondsLeft = data.seconds_left;
+            if (expiresLabel && data.expires_at) {
+                const d = new Date(data.expires_at);
+                expiresLabel.textContent = 'Expire à ' + d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            }
+        } catch (e) {}
+    }
+
+    updateCountdown();
+    setInterval(updateCountdown, 1000);
+    setInterval(refreshQr, 1000);
+})();
 </script>
 @endsection

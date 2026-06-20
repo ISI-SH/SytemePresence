@@ -22,7 +22,8 @@ class DashboardController extends Controller {
                 'tolerance_minutes'   => (int) config('attendance.late_tolerance_minutes', 15),
             ];
         }
-        $hasToken        = DailyToken::today() !== null;
+        DailyToken::ensureCurrent();
+        $hasToken        = DailyToken::current() !== null;
         $history         = $user->attendances()->orderBy('date', 'desc')->limit(30)->get();
         $monthStats      = $user->attendances()
             ->whereMonth('date', now()->month)->whereYear('date', now()->year)
@@ -45,8 +46,9 @@ class DashboardController extends Controller {
             ->with($result['success'] ? 'success' : 'error', $result['message']);
     }
 
-    public function checkOut() {
-        $result = $this->attendanceService->checkOut(Auth::user());
+    public function checkOut(Request $request) {
+        $request->validate(['token' => 'required|string']);
+        $result = $this->attendanceService->checkOut(Auth::user(), $request->token);
         return redirect()->route('employee.dashboard')
             ->with($result['success'] ? 'success' : 'error', $result['message']);
     }

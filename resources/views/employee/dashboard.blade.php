@@ -74,19 +74,34 @@
                     <p class="text-xs text-green-500 mt-1">Via {{ $todayAttendance->method === 'qr' ? 'QR code' : 'Admin' }}</p>
                 </div>
                 @if(!$todayAttendance->check_out)
-                    <form method="POST" action="{{ route('employee.checkout') }}">
-                        @csrf
-                        <button type="submit" onclick="return confirm('Confirmer le départ ?')"
-                                class="w-full h-full bg-slate-800 hover:bg-slate-700 text-white font-semibold
-                                       rounded-xl transition-colors flex flex-col items-center justify-center
-                                       gap-2 min-h-[100px] text-sm p-4">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                      d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
-                            </svg>
-                            Check-out
-                        </button>
-                    </form>
+                    @if(!$hasToken)
+                        <div class="bg-yellow-50 border border-yellow-200 rounded-xl p-5 text-center">
+                            <p class="text-yellow-700 font-semibold text-sm">⚠️ Aucun QR code actif</p>
+                            <p class="text-yellow-600 text-xs mt-1">Contactez l'administrateur.</p>
+                        </div>
+                    @else
+                        <form method="POST" action="{{ route('employee.checkout') }}" id="checkout-form">
+                            @csrf
+                            <input type="hidden" name="token" id="checkout-token-input">
+                            <div class="border-2 border-dashed border-slate-300 rounded-xl bg-slate-50 p-4 text-center mb-3">
+                                <div id="checkout-scanner-placeholder">
+                                    <p class="text-sm font-semibold text-slate-700">Scanner le QR pour le départ</p>
+                                    <p class="text-xs text-slate-500 mt-1">affiché à l'entrée</p>
+                                </div>
+                                <div id="checkout-qr-reader" class="hidden mx-auto" style="max-width:240px;"></div>
+                            </div>
+                            <button type="button" id="start-checkout-scan-btn"
+                                    class="w-full h-full bg-slate-800 hover:bg-slate-700 text-white font-semibold
+                                           rounded-xl transition-colors flex flex-col items-center justify-center
+                                           gap-2 min-h-[80px] text-sm p-4">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                          d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                                </svg>
+                                Scanner pour check-out
+                            </button>
+                        </form>
+                    @endif
                 @else
                     <div class="bg-gray-50 border border-gray-200 rounded-xl p-4">
                         <p class="text-xs text-gray-500 font-semibold mb-1">🏠 Départ</p>
@@ -168,29 +183,58 @@
 @push('scripts')
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script>
-let html5QrCode = null;
-document.getElementById('start-scan-btn')?.addEventListener('click', function () {
-    document.getElementById('scanner-placeholder').classList.add('hidden');
-    document.getElementById('qr-reader').classList.remove('hidden');
-    this.disabled    = true;
-    this.textContent = 'Scan en cours…';
+function initQrScanner(options) {
+    const btn = document.getElementById(options.btnId);
+    if (!btn) return;
 
-    html5QrCode = new Html5Qrcode("qr-reader");
-    html5QrCode.start(
-        { facingMode: "environment" },
-        { fps: 10, qrbox: { width: 240, height: 240 } },
-        function (decodedText) {
-            document.getElementById('qr-token-input').value = decodedText;
-            html5QrCode.stop().then(() => document.getElementById('checkin-form').submit());
-        },
-        function () {}
-    ).catch(err => {
-        alert("Impossible d'accéder à la caméra : " + err);
-        document.getElementById('scanner-placeholder').classList.remove('hidden');
-        document.getElementById('qr-reader').classList.add('hidden');
-        this.disabled    = false;
-        this.textContent = 'Scanner le QR code';
+    let scanner = null;
+
+    btn.addEventListener('click', function () {
+        const placeholder = document.getElementById(options.placeholderId);
+        const readerEl = document.getElementById(options.readerId);
+        const form = document.getElementById(options.formId);
+        const input = document.getElementById(options.inputId);
+
+        placeholder?.classList.add('hidden');
+        readerEl?.classList.remove('hidden');
+        btn.disabled = true;
+        btn.textContent = 'Scan en cours…';
+
+        scanner = new Html5Qrcode(options.readerId);
+        scanner.start(
+            { facingMode: 'environment' },
+            { fps: 10, qrbox: { width: 240, height: 240 } },
+            function (decodedText) {
+                input.value = decodedText;
+                scanner.stop().then(() => form.submit());
+            },
+            function () {}
+        ).catch(err => {
+            alert('Impossible d\'accéder à la caméra : ' + err);
+            placeholder?.classList.remove('hidden');
+            readerEl?.classList.add('hidden');
+            btn.disabled = false;
+            btn.textContent = options.btnLabel;
+        });
     });
+}
+
+initQrScanner({
+    formId: 'checkin-form',
+    inputId: 'qr-token-input',
+    readerId: 'qr-reader',
+    placeholderId: 'scanner-placeholder',
+    btnId: 'start-scan-btn',
+    btnLabel: 'Scanner le QR code'
+});
+
+initQrScanner({
+    formId: 'checkout-form',
+    inputId: 'checkout-token-input',
+    readerId: 'checkout-qr-reader',
+    placeholderId: 'checkout-scanner-placeholder',
+    btnId: 'start-checkout-scan-btn',
+    btnLabel: 'Scanner pour check-out'
 });
 </script>
 @endpush

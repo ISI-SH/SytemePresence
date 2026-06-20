@@ -11,8 +11,7 @@ class AttendanceService
 {
     public function checkIn(User $user, string $scannedToken): array
     {
-        $dailyToken = DailyToken::today();
-        if (!$dailyToken || !$dailyToken->isValid($scannedToken)) {
+        if (!DailyToken::isTokenValid($scannedToken)) {
             return ['success' => false, 'message' => 'QR code invalide ou expiré.'];
         }
 
@@ -46,8 +45,12 @@ class AttendanceService
         ];
     }
 
-    public function checkOut(User $user): array
+    public function checkOut(User $user, string $scannedToken): array
     {
+        if (!DailyToken::isTokenValid($scannedToken)) {
+            return ['success' => false, 'message' => 'QR code invalide ou expiré.'];
+        }
+
         $attendance = $user->attendances()->whereDate('date', today())->first();
         if (!$attendance || !$attendance->check_in) {
             return ['success' => false, 'message' => 'Aucun check-in trouvé.'];
