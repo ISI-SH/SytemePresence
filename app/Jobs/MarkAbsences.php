@@ -15,7 +15,7 @@ class MarkAbsences implements ShouldQueue
     public function handle(): void
     {
         // Récupérer tous les employés actifs
-        $employes = User::where('role', 'employee')
+        $employes = User::whereIn('role', ['employe', 'employee'])
             ->where('is_active', true)
             ->get();
 

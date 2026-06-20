@@ -2,7 +2,7 @@
 
 namespace App\Exports;
 
-use App\Models\Pointage;
+use App\Models\Attendance;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
@@ -18,15 +18,14 @@ class ExportPointages implements FromCollection, WithHeadings, WithMapping
 
     public function collection()
     {
-        $query = Pointage::with('user');
+        $query = Attendance::with('user');
 
-        // Appliquer les filtres
         if (isset($this->filters['date_start']) && $this->filters['date_start']) {
-            $query->whereDate('check_in', '>=', $this->filters['date_start']);
+            $query->whereDate('date', '>=', $this->filters['date_start']);
         }
 
         if (isset($this->filters['date_end']) && $this->filters['date_end']) {
-            $query->whereDate('check_in', '<=', $this->filters['date_end']);
+            $query->whereDate('date', '<=', $this->filters['date_end']);
         }
 
         if (isset($this->filters['employee_id']) && $this->filters['employee_id']) {
@@ -37,7 +36,7 @@ class ExportPointages implements FromCollection, WithHeadings, WithMapping
             $query->where('status', $this->filters['status']);
         }
 
-        return $query->orderBy('check_in', 'desc')->get();
+        return $query->orderBy('date', 'desc')->orderBy('check_in', 'desc')->get();
     }
 
     public function headings(): array
@@ -58,13 +57,13 @@ class ExportPointages implements FromCollection, WithHeadings, WithMapping
     {
         return [
             $pointage->id,
-            $pointage->user->name,
-            $pointage->user->email,
-            $pointage->check_in ? $pointage->check_in->format('d/m/Y') : '-',
+            $pointage->user?->name ?? '-',
+            $pointage->user?->email ?? '-',
+            $pointage->date ? $pointage->date->format('d/m/Y') : '-',
             $pointage->check_in ? $pointage->check_in->format('H:i') : '-',
             $pointage->check_out ? $pointage->check_out->format('H:i') : '-',
-            $pointage->status,
-            $pointage->hours_worked ? $pointage->hours_worked . 'h' : '-'
+            $pointage->statusLabel(),
+            $pointage->hoursWorkedFormatted(),
         ];
     }
 }

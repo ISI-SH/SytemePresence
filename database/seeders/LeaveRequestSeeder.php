@@ -2,22 +2,18 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Illuminate\Database\Seeder;
-use App\Models\demandeConges;
+use App\Models\LeaveRequest;
 use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Database\Seeder;
 
-class DemandeCongeSeeder extends Seeder
+class LeaveRequestSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        $employees = User::where('role', 'employe')->where('is_active', true)->get();
+        $employees = User::whereIn('role', ['employe', 'employee'])->where('is_active', true)->get();
         $admin = User::where('role', 'admin')->first();
-        
+
         $reasons = [
             'Vacances personnelles',
             'Maladie',
@@ -25,25 +21,23 @@ class DemandeCongeSeeder extends Seeder
             'Déménagement',
             'Rendez-vous médical',
         ];
-        
-        // Créer quelques demandes de congés
+
         foreach ($employees as $index => $employee) {
             $startDate = Carbon::now()->addDays(rand(5, 20));
             $endDate = $startDate->copy()->addDays(rand(1, 5));
-            
-            $status = 'en_attente';
+
+            $status = 'pending';
             $reviewedBy = null;
-            
-            // Alternance des statuts pour la démo
+
             if ($index % 3 === 0) {
-                $status = 'accepte';
-                $reviewedBy = $admin->id;
+                $status = 'approved';
+                $reviewedBy = $admin?->id;
             } elseif ($index % 3 === 1) {
-                $status = 'refuse';
-                $reviewedBy = $admin->id;
+                $status = 'rejected';
+                $reviewedBy = $admin?->id;
             }
-            
-            demandeConges::create([
+
+            LeaveRequest::create([
                 'user_id' => $employee->id,
                 'start_date' => $startDate,
                 'end_date' => $endDate,

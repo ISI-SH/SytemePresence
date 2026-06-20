@@ -76,9 +76,10 @@
                             <select name="status" id="status" 
                                 class="block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
                                 <option value="">Tous les statuts</option>
-                                <option value="Présent" {{ request('status') == 'Présent' ? 'selected' : '' }}>Présent</option>
-                                <option value="En retard" {{ request('status') == 'En retard' ? 'selected' : '' }}>En retard</option>
-                                <option value="Absent" {{ request('status') == 'Absent' ? 'selected' : '' }}>Absent</option>
+                                <option value="present" {{ request('status') == 'present' ? 'selected' : '' }}>Présent</option>
+                                <option value="late" {{ request('status') == 'late' ? 'selected' : '' }}>En retard</option>
+                                <option value="early_departure" {{ request('status') == 'early_departure' ? 'selected' : '' }}>Départ anticipé</option>
+                                <option value="absent" {{ request('status') == 'absent' ? 'selected' : '' }}>Absent</option>
                             </select>
                         </div>
                     </div>
@@ -119,7 +120,7 @@
                                         <div class="text-sm text-gray-500">{{ $pointage->user->email }}</div>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                        {{ $pointage->check_in ? $pointage->check_in->format('d/m/Y') : '-' }}
+                                        {{ $pointage->date ? $pointage->date->format('d/m/Y') : '-' }}
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                         {{ $pointage->check_in ? $pointage->check_in->format('H:i') : '-' }}
@@ -128,13 +129,17 @@
                                         {{ $pointage->check_out ? $pointage->check_out->format('H:i') : '-' }}
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        @if($pointage->status == 'Présent')
+                                        @if($pointage->status == 'present')
                                             <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
                                                 Présent
                                             </span>
-                                        @elseif($pointage->status == 'En retard')
+                                        @elseif($pointage->status == 'late')
                                             <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
                                                 En retard
+                                            </span>
+                                        @elseif($pointage->status == 'early_departure')
+                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                                                Départ anticipé
                                             </span>
                                         @else
                                             <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
@@ -143,7 +148,7 @@
                                         @endif
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                        {{ $pointage->hours_worked ? $pointage->hours_worked . 'h' : '-' }}
+                                        {{ $pointage->hoursWorkedFormatted() }}
                                     </td>
                                 </tr>
                             @empty

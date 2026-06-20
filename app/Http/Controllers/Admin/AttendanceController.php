@@ -3,26 +3,25 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use App\Models\Pointage;
+use App\Models\Attendance;
 use App\Models\User;
 use App\Exports\ExportPointages;
+use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
-use Carbon\Carbon;
 
 class AttendanceController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Pointage::with('user');
+        $query = Attendance::with('user');
         
         // Filtre par date
         if ($request->has('date_start') && $request->date_start) {
-            $query->whereDate('check_in', '>=', $request->date_start);
+            $query->whereDate('date', '>=', $request->date_start);
         }
         
         if ($request->has('date_end') && $request->date_end) {
-            $query->whereDate('check_in', '<=', $request->date_end);
+            $query->whereDate('date', '<=', $request->date_end);
         }
         
         // Filtre par employé
@@ -35,10 +34,9 @@ class AttendanceController extends Controller
             $query->where('status', $request->status);
         }
         
-        $pointages = $query->orderBy('check_in', 'desc')->paginate(20);
+        $pointages = $query->orderBy('date', 'desc')->orderBy('check_in', 'desc')->paginate(20);
         
-        // Récupérer tous les employés pour le filtre
-        $employees = User::where('role', 'employe')->orderBy('name')->get();
+        $employees = User::whereIn('role', ['employe', 'employee'])->orderBy('name')->get();
         
         return view('admin.pointages.index', compact('pointages', 'employees'));
     }

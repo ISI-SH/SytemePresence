@@ -24,18 +24,6 @@ class User extends Authenticatable
         'is_active'         => 'boolean',
     ];
 
-    // Système admin (pointages / demandes congés)
-    public function pointages()
-    {
-        return $this->hasMany(Pointage::class);
-    }
-
-    public function demandesConges()
-    {
-        return $this->hasMany(demandeConges::class);
-    }
-
-    // Système employé (attendance / congés / départements)
     public function department()
     {
         return $this->belongsTo(Department::class);

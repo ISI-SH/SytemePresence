@@ -16,9 +16,9 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             UserSeeder::class,
-            PointageSeeder::class,
-            DemandeCongeSeeder::class,
-            QrCodeSeeder::class,
+            AttendanceSeeder::class,
+            LeaveRequestSeeder::class,
+            DailyTokenSeeder::class,
         ]);
     }
 }
