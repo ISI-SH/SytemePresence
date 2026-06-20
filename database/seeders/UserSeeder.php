@@ -15,15 +15,17 @@ class UserSeeder extends Seeder
     public function run(): void
     {
         // Créer l'admin
-        User::create([
-            'name' => 'Admin',
-            'email' => 'admin@gmail.com',
-            'password' => Hash::make('password'),
-            'role' => 'admin',
-            'is_active' => true,
-            'phone' => '0612345678',
-            'hire_date' => '2024-01-01',
-        ]);
+        User::updateOrCreate(
+            ['email' => 'admin@gmail.com'],
+            [
+                'name' => 'Admin',
+                'password' => Hash::make('password'),
+                'role' => 'admin',
+                'is_active' => true,
+                'phone' => '0612345678',
+                'hire_date' => '2024-01-01',
+            ]
+        );
 
         // Créer des employés
         $employees = [

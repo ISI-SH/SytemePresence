@@ -2,40 +2,67 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Database\Factories\UserFactory;
-use Illuminate\Database\Eloquent\Attributes\Fillable;
-use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use  App\Models\pointages;
-use App\Models\demandeConges;
-#[Fillable(['name', 'email', 'password', 'role', 'is_active', 'phone', 'hire_date', 'photo'])]
-#[Hidden(['password', 'remember_token'])]
+
 class User extends Authenticatable
 {
-    /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
+    protected $fillable = [
+        'name', 'email', 'password', 'role', 'department_id', 'is_active',
+        'phone', 'hire_date', 'photo',
+    ];
+
+    protected $hidden = ['password', 'remember_token'];
+
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+        'password'          => 'hashed',
+        'hire_date'         => 'date',
+        'is_active'         => 'boolean',
+    ];
+
+    // Système admin (pointages / demandes congés)
+    public function pointages()
     {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-            'hire_date' => 'date',
-        ];
+        return $this->hasMany(Pointage::class);
     }
-    // app/Models/User.php
-public function pointages() {
-    return $this->hasMany(Pointage::class);
-}
-public function demandesConges() {
-    return $this->hasMany(DemandeConges::class);
-}
+
+    public function demandesConges()
+    {
+        return $this->hasMany(demandeConges::class);
+    }
+
+    // Système employé (attendance / congés / départements)
+    public function department()
+    {
+        return $this->belongsTo(Department::class);
+    }
+
+    public function attendances()
+    {
+        return $this->hasMany(Attendance::class);
+    }
+
+    public function leaveRequests()
+    {
+        return $this->hasMany(LeaveRequest::class);
+    }
+
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin';
+    }
+
+    public function isEmployee(): bool
+    {
+        return in_array($this->role, ['employe', 'employee'], true);
+    }
+
+    public function todayAttendance(): ?Attendance
+    {
+        return $this->attendances()->whereDate('date', today())->first();
+    }
 }

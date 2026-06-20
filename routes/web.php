@@ -1,28 +1,22 @@
 <?php
 
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\EmployeeController;
 use App\Http\Controllers\Admin\AttendanceController;
 use App\Http\Controllers\Admin\LeaveController;
 use App\Http\Controllers\Admin\SettingsController;
+use App\Http\Controllers\Employee\DashboardController as EmployeeDashboardController;
 use Illuminate\Support\Facades\Route;
 
-//Route::get('/', function () {
-  //  return view('welcome');
-//});
+Route::get('/login', [AuthController::class, 'index'])->name('login');
+Route::post('/login', [AuthController::class, 'login'])->name('login.post');
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-Route::get('/login',[AuthController::class,'index'])->name('login');
-
-Route::post('/login',[AuthController::class,'login'])->name('login.post');
-Route::post('/logout',[AuthController::class,'logout'])->name('logout');
-
-// Routes Admin protégées par middleware auth et role:admin
+// Routes Admin
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
-    // Dashboard
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
 
-    // Gestion des employés
     Route::prefix('employes')->name('employes.')->group(function () {
         Route::get('/', [EmployeeController::class, 'index'])->name('index');
         Route::get('/create', [EmployeeController::class, 'create'])->name('create');
@@ -33,22 +27,31 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
         Route::delete('/{employee}', [EmployeeController::class, 'destroy'])->name('destroy');
     });
 
-    // Historique des pointages
     Route::prefix('pointages')->name('pointages.')->group(function () {
         Route::get('/', [AttendanceController::class, 'index'])->name('index');
         Route::get('/export', [AttendanceController::class, 'export'])->name('export');
     });
 
-    // Gestion des demandes de congé
     Route::prefix('demandes')->name('demandes.')->group(function () {
         Route::get('/', [LeaveController::class, 'index'])->name('index');
         Route::put('/{demande}/approve', [LeaveController::class, 'approve'])->name('approve');
         Route::put('/{demande}/reject', [LeaveController::class, 'reject'])->name('reject');
     });
 
-    // Paramètres de présence
     Route::prefix('settings')->name('settings.')->group(function () {
         Route::get('/', [SettingsController::class, 'index'])->name('index');
         Route::put('/', [SettingsController::class, 'update'])->name('update');
     });
 });
+
+// Routes Employé
+Route::middleware(['auth', 'role:employe,employee'])
+    ->prefix('employee')->name('employee.')
+    ->group(function () {
+        Route::get('/dashboard', [EmployeeDashboardController::class, 'index'])->name('dashboard');
+        Route::post('/check-in', [EmployeeDashboardController::class, 'checkIn'])->name('checkin');
+        Route::post('/check-out', [EmployeeDashboardController::class, 'checkOut'])->name('checkout');
+        Route::get('/history', [EmployeeDashboardController::class, 'history'])->name('history');
+        Route::get('/leaves', [EmployeeDashboardController::class, 'leaveIndex'])->name('leaves.index');
+        Route::post('/leaves', [EmployeeDashboardController::class, 'leaveStore'])->name('leaves.store');
+    });

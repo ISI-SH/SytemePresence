@@ -1,8 +1,11 @@
 <?php
 
-use Illuminate\Foundation\Inspiring;
-use Illuminate\Support\Facades\Artisan;
+use App\Jobs\GenerateDailyToken;
+use App\Jobs\MarkAbsences;
+use Illuminate\Support\Facades\Schedule;
 
-Artisan::command('inspire', function () {
-    $this->comment(Inspiring::quote());
-})->purpose('Display an inspiring quote');
+// Génère le QR du jour tous les jours à minuit
+Schedule::job(new GenerateDailyToken)->dailyAt('00:00');
+
+// Marque les absents tous les jours à 23h55
+Schedule::job(new MarkAbsences)->dailyAt('23:55');
