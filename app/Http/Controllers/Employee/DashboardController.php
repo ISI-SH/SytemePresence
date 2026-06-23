@@ -20,31 +20,23 @@ class DashboardController extends Controller {
 
         // Vérifie si l'employé a déjà pointé aujourd'hui
         $todayAttendance = $user->todayAttendance();
-
-        // Récupère l'horaire du jour selon son département
         $schedule = $user->department?->todaySchedule();
-
-        // Vérifie s'il existe un QR code (token) généré aujourd'hui
-        $hasToken = DailyToken::today() !== null;
-
-        // Historique des 30 derniers pointages
-        $history = $user->attendances()
-            ->orderBy('date', 'desc')
-            ->limit(30)
-            ->get();
-
-        // Statistiques du mois (présences, retards, absences, etc.)
-        $monthStats = $user->attendances()
-            ->whereMonth('date', now()->month)
-            ->whereYear('date', now()->year)
-            ->selectRaw("
-                COUNT(*) AS total,
-                SUM(status='present') AS present,
-                SUM(status='late') AS late,
-                SUM(status='absent') AS absent,
-                SUM(status='early_departure') AS early_departure,
-                ROUND(AVG(CASE WHEN hours_worked IS NOT NULL THEN hours_worked END)/60,1) AS avg_hours
-            ")
+        if (!$schedule) {
+            $schedule = (object) [
+                'start_time'          => config('attendance.fixed_arrival_time', '09:00'),
+                'end_time'            => config('attendance.work_end_time', '17:00'),
+                'tolerance_minutes'   => (int) config('attendance.late_tolerance_minutes', 15),
+            ];
+        }
+        DailyToken::ensureCurrent();
+        $hasToken        = DailyToken::current() !== null;
+        $history         = $user->attendances()->orderBy('date', 'desc')->limit(30)->get();
+        $monthStats      = $user->attendances()
+            ->whereMonth('date', now()->month)->whereYear('date', now()->year)
+            ->selectRaw("COUNT(*) AS total, SUM(status='present') AS present,
+                         SUM(status='late') AS late, SUM(status='absent') AS absent,
+                         SUM(status='early_departure') AS early_departure,
+                         ROUND(AVG(CASE WHEN hours_worked IS NOT NULL THEN hours_worked END)/60,1) AS avg_hours")
             ->first();
 
         // Nombre de demandes de congé en attente
@@ -69,11 +61,9 @@ class DashboardController extends Controller {
             ->with($result['success'] ? 'success' : 'error', $result['message']);
     }
 
-    public function checkOut() {
-
-        // Appelle le service pour enregistrer l'heure de sortie
-        $result = $this->attendanceService->checkOut(Auth::user());
-
+    public function checkOut(Request $request) {
+        $request->validate(['token' => 'required|string']);
+        $result = $this->attendanceService->checkOut(Auth::user(), $request->token);
         return redirect()->route('employee.dashboard')
             ->with($result['success'] ? 'success' : 'error', $result['message']);
     }

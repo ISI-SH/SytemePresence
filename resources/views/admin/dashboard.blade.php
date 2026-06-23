@@ -1,46 +1,9 @@
-@extends('layouts.app')
+@extends('layouts.admin')
+
+@section('page-title', 'Tableau de bord')
 
 @section('content')
-<div class="min-h-screen bg-gray-100">
-    <nav class="bg-white shadow-sm border-b border-gray-200">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16">
-                <div class="flex">
-                    <div class="flex-shrink-0 flex items-center">
-                        <h1 class="text-xl font-bold text-gray-900">Dashboard Admin</h1>
-                    </div>
-                    <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
-                        <a href="{{ route('admin.dashboard') }}" class="border-indigo-500 text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
-                            Dashboard
-                        </a>
-                        <a href="{{ route('admin.employes.index') }}" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
-                            Employés
-                        </a>
-                        <a href="{{ route('admin.pointages.index') }}" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
-                            Pointages
-                        </a>
-                        <a href="{{ route('admin.demandes.index') }}" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
-                            Congés
-                        </a>
-                        <a href="{{ route('admin.settings.index') }}" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
-                            Paramètres
-                        </a>
-                    </div>
-                </div>
-                <div class="flex items-center">
-                    <span class="text-sm text-gray-700 mr-4">{{ auth()->user()->name }}</span>
-                    <form action="{{ route('logout') }}" method="POST">
-                        @csrf
-                        <button type="submit" class="text-sm text-red-600 hover:text-red-900">Déconnexion</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </nav>
-
-    <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-        <!-- Statistiques du jour -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             <!-- Présents -->
             <div class="bg-white overflow-hidden shadow rounded-lg">
                 <div class="p-5">
@@ -117,20 +80,23 @@
             <!-- QR Code actif -->
             <div class="bg-white overflow-hidden shadow rounded-lg">
                 <div class="p-5">
-                    <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">QR Code actif du jour</h3>
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg leading-6 font-medium text-gray-900">QR Code de pointage</h3>
+                        <span id="qr-countdown" class="text-xs font-mono text-indigo-600 bg-indigo-50 px-2 py-1 rounded"></span>
+                    </div>
                     @if($qrCode)
                         <div class="flex items-center justify-center">
                             <div class="text-center">
                                 <div class="bg-white p-4 border-2 border-gray-300 rounded-lg inline-block">
-                                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data={{ $qrCode->token }}" alt="QR Code" class="w-48 h-48">
+                                    <img id="admin-qr-image" src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data={{ $qrCode->token }}" alt="QR Code" class="w-48 h-48">
                                 </div>
-                                <p class="text-sm text-gray-600 mt-4">Token: {{ $qrCode->token }}</p>
-                                <p class="text-sm text-gray-500">Expire: {{ $qrCode->expires_at->format('H:i') }}</p>
+                                <p class="text-xs text-gray-500 mt-3">Renouvelé chaque minute · valable pour arrivée et départ</p>
+                                <p id="qr-expires-label" class="text-sm text-gray-500 mt-1">Expire à {{ $qrCode->expires_at->format('H:i:s') }}</p>
                             </div>
                         </div>
                     @else
                         <div class="text-center text-gray-500">
-                            <p>Aucun QR code actif pour aujourd'hui</p>
+                            <p>Aucun QR code actif</p>
                         </div>
                     @endif
                 </div>
@@ -190,5 +156,41 @@
             }
         }
     });
+</script>
+<script>
+(function () {
+    const qrImage = document.getElementById('admin-qr-image');
+    const countdown = document.getElementById('qr-countdown');
+    const expiresLabel = document.getElementById('qr-expires-label');
+    if (!qrImage) return;
+
+    let secondsLeft = {{ $qrCode?->secondsUntilExpiry() ?? 0 }};
+
+    function updateCountdown() {
+        if (!countdown) return;
+        countdown.textContent = secondsLeft > 0 ? 'Nouveau QR dans ' + secondsLeft + 's' : 'Mise à jour…';
+        if (secondsLeft > 0) secondsLeft--;
+    }
+
+    async function refreshQr() {
+        try {
+            const res = await fetch('{{ route('admin.qr.current') }}', {
+                headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
+            });
+            if (!res.ok) return;
+            const data = await res.json();
+            qrImage.src = data.qr_url;
+            secondsLeft = data.seconds_left;
+            if (expiresLabel && data.expires_at) {
+                const d = new Date(data.expires_at);
+                expiresLabel.textContent = 'Expire à ' + d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            }
+        } catch (e) {}
+    }
+
+    updateCountdown();
+    setInterval(updateCountdown, 1000);
+    setInterval(refreshQr, 1000);
+})();
 </script>
 @endsection

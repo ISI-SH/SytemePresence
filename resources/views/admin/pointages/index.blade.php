@@ -1,51 +1,15 @@
-@extends('layouts.app')
+@extends('layouts.admin')
+
+@section('page-title', 'Historique des Pointages')
 
 @section('content')
-<div class="min-h-screen bg-gray-100">
-    <nav class="bg-white shadow-sm border-b border-gray-200">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16">
-                <div class="flex">
-                    <div class="flex-shrink-0 flex items-center">
-                        <h1 class="text-xl font-bold text-gray-900">Historique des Pointages</h1>
-                    </div>
-                    <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
-                        <a href="{{ route('admin.dashboard') }}" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
-                            Dashboard
-                        </a>
-                        <a href="{{ route('admin.employes.index') }}" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
-                            Employés
-                        </a>
-                        <a href="{{ route('admin.pointages.index') }}" class="border-indigo-500 text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
-                            Pointages
-                        </a>
-                        <a href="{{ route('admin.demandes.index') }}" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
-                            Congés
-                        </a>
-                        <a href="{{ route('admin.settings.index') }}" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
-                            Paramètres
-                        </a>
-                    </div>
-                </div>
-                <div class="flex items-center">
-                    <span class="text-sm text-gray-700 mr-4">{{ auth()->user()->name }}</span>
-                    <form action="{{ route('logout') }}" method="POST">
-                        @csrf
-                        <button type="submit" class="text-sm text-red-600 hover:text-red-900">Déconnexion</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </nav>
-
-    <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-        <div class="bg-white shadow rounded-lg">
-            <div class="px-4 py-5 sm:p-6">
+<div class="bg-white shadow rounded-lg">
+    <div class="px-4 py-5 sm:p-6">
                 <h2 class="text-lg font-medium text-gray-900 mb-6">Filtres</h2>
 
                 <!-- Formulaire de filtres -->
                 <form action="{{ route('admin.pointages.index') }}" method="GET" class="mb-6">
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                         <div>
                             <label for="date_start" class="block text-sm font-medium text-gray-700 mb-1">Date début</label>
                             <input type="date" name="date_start" id="date_start" value="{{ request('date_start') }}" 
@@ -84,7 +48,7 @@
                         </div>
                     </div>
                     
-                    <div class="mt-4 flex gap-4">
+                    <div class="mt-4 flex flex-col sm:flex-row gap-4">
                         <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700">
                             Filtrer
                         </button>
@@ -104,31 +68,31 @@
                     <table class="min-w-full divide-y divide-gray-200">
                         <thead class="bg-gray-50">
                             <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Employé</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Arrivée</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Départ</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Statut</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Heures travaillées</th>
+                                <th class="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Employé</th>
+                                <th class="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                                <th class="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Arrivée</th>
+                                <th class="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">Départ</th>
+                                <th class="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Statut</th>
+                                <th class="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">Heures travaillées</th>
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
                             @forelse($pointages as $pointage)
                                 <tr>
-                                    <td class="px-6 py-4 whitespace-nowrap">
+                                    <td class="px-4 sm:px-6 py-4 whitespace-nowrap">
                                         <div class="text-sm font-medium text-gray-900">{{ $pointage->user->name }}</div>
-                                        <div class="text-sm text-gray-500">{{ $pointage->user->email }}</div>
+                                        <div class="text-xs text-gray-500 sm:hidden">{{ $pointage->user->email }}</div>
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                    <td class="px-4 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                         {{ $pointage->date ? $pointage->date->format('d/m/Y') : '-' }}
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                    <td class="px-4 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                         {{ $pointage->check_in ? $pointage->check_in->format('H:i') : '-' }}
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                    <td class="px-4 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-900 hidden sm:table-cell">
                                         {{ $pointage->check_out ? $pointage->check_out->format('H:i') : '-' }}
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
+                                    <td class="px-4 sm:px-6 py-4 whitespace-nowrap">
                                         @if($pointage->status == 'present')
                                             <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
                                                 Présent
@@ -147,13 +111,13 @@
                                             </span>
                                         @endif
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                    <td class="px-4 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-900 hidden md:table-cell">
                                         {{ $pointage->hoursWorkedFormatted() }}
                                     </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="6" class="px-6 py-4 text-center text-gray-500">
+                                    <td colspan="6" class="px-4 sm:px-6 py-4 text-center text-gray-500">
                                         Aucun pointage trouvé
                                     </td>
                                 </tr>
@@ -170,6 +134,4 @@
                 @endif
             </div>
         </div>
-    </div>
-</div>
 @endsection

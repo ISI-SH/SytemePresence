@@ -9,11 +9,11 @@ use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\Employee\DashboardController as EmployeeDashboardController;
 use Illuminate\Support\Facades\Route;
 
-// ==========================
-// AUTHENTIFICATION
-// ==========================
+// Home page route
+Route::get('/', function () {
+    return view('welcome');
+})->name('home');
 
-// Affiche la page de connexion
 Route::get('/login', [AuthController::class, 'index'])->name('login');
 
 // Traite les informations saisies dans le formulaire de connexion
@@ -22,6 +22,10 @@ Route::post('/login', [AuthController::class, 'login'])->name('login.post');
 // Déconnexion de l'utilisateur
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
+// Routes Admin
+Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
+    Route::get('/qr/current', [AdminDashboardController::class, 'currentQr'])->name('qr.current');
 
 // ==========================
 // ROUTES ADMINISTRATEUR

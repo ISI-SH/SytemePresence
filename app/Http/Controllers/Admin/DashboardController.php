@@ -126,7 +126,7 @@ class DashboardController extends Controller
             ];
         }
 
-        $qrCode = DailyToken::whereDate('date', $today)->first();
+        $qrCode = DailyToken::ensureCurrent();
         $qrCodeSvg = null;
         if ($qrCode) {
             $qrCodeSvg = '<img src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=' . urlencode($qrCode->token) . '" alt="QR Code">';
@@ -144,5 +144,18 @@ class DashboardController extends Controller
             'qrCode',
             'qrCodeSvg'
         ));
+    }
+
+    public function currentQr()
+    {
+        $token = DailyToken::ensureCurrent();
+
+        return response()->json([
+            'token'           => $token->token,
+            'valid_from'      => $token->valid_from->toIso8601String(),
+            'expires_at'      => $token->expires_at->toIso8601String(),
+            'seconds_left'    => $token->secondsUntilExpiry(),
+            'qr_url'          => 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' . urlencode($token->token),
+        ]);
     }
 }
