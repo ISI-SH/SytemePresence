@@ -13,14 +13,26 @@ class GenerateDailyToken implements ShouldQueue
 
     public function handle(): void
     {
-        // Eviter de créer un doublon si le job tourne deux fois
+        // Vérifie si un token existe déjà aujourd'hui
+        // pour éviter la création de doublons
         $existe = DailyToken::whereDate('date', today())->first();
+
+        // Si un token existe déjà, on arrête le traitement
         if ($existe) return;
 
+        // Création du token du jour
         DailyToken::create([
-            'token'      => Str::random(64),
-            'date'       => today(),
-            'expires_at' => now()->endOfDay(), // expire à 23:59:59
+
+            // Génération d'une chaîne aléatoire de 64 caractères
+            // qui sera encodée dans le QR Code
+            'token' => Str::random(64),
+
+            // Date du jour
+            'date' => today(),
+
+            // Heure d'expiration du QR Code
+            // (23h59min59s)
+            'expires_at' => now()->endOfDay(),
         ]);
     }
 }
