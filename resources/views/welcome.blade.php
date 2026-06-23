@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Système de Présence - Gestion des Pointages</title>
+    <title>SystÃ¨me de PrÃ©sence - Gestion des Pointages</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -30,20 +30,17 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                         </svg>
                     </div>
-                    <span class="text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">PrésenceApp</span>
+                    <span class="text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">PrÃ©senceApp</span>
                 </div>
                 <div class="flex items-center gap-4">
                     @if (Route::has("login"))
                         @auth
-                            <a href="{{ url("/dashboard") }}" class="hidden sm:inline-flex items-center px-5 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-medium hover:shadow-lg hover:shadow-blue-500/30 transition-all duration-300">
+                            <a href="{{ url('/dashboard') }}" class="hidden sm:inline-flex items-center px-5 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-medium hover:shadow-lg hover:shadow-blue-500/30 transition-all duration-300">
                                 Tableau de bord
                             </a>
                         @else
-                            <a href="{{ route("login") }}" class="px-5 py-2.5 text-gray-700 font-medium hover:text-blue-600 transition-colors">
+                            <a href="{{ route('login') }}" class="px-5 py-2.5 text-gray-700 font-medium hover:text-blue-600 transition-colors">
                                 Connexion
-                            </a>
-                            <a href="{{ route("login") }}" class="px-5 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-medium hover:shadow-lg hover:shadow-blue-500/30 transition-all duration-300">
-                                Démarrer
                             </a>
                         @endauth
                     @endif
@@ -60,37 +57,35 @@
                 <div class="space-y-8">
                     <div class="inline-flex items-center gap-2 px-4 py-2 bg-blue-100 rounded-full">
                         <span class="w-2 h-2 bg-blue-600 rounded-full animate-pulse"></span>
-                        <span class="text-sm font-medium text-blue-700">Système de gestion de présence</span>
+                        <span class="text-sm font-medium text-blue-700">SystÃ¨me de gestion de prÃ©sence</span>
                     </div>
                     <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-gray-900 leading-tight">
-                        Gérez vos
+                        GÃ©rez vos
                         <span class="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent"> pointages</span>
-                        en toute simplicité
+                        en toute simplicitÃ©
                     </h1>
                     <p class="text-lg text-gray-600 leading-relaxed max-w-xl">
-                        Une solution moderne et intuitive pour suivre les présences de vos employés. QR code, horaires flexibles et gestion des congés le tout en un seul endroit.
+                        Une solution moderne et intuitive pour suivre les prÃ©sences de vos employÃ©s. QR code, horaires flexibles et gestion des congÃ©s le tout en un seul endroit.
                     </p>
                     <div class="flex flex-col sm:flex-row gap-4">
                         @if (Route::has("login"))
                             @auth
-                                <a href="{{ url("/dashboard") }}" class="inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-semibold hover:shadow-xl hover:shadow-blue-500/30 transition-all duration-300 text-center">
-                                    Accéder au tableau de bord
+                                <a href="{{ url('admin/dashboard') }}" class="inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-semibold hover:shadow-xl hover:shadow-blue-500/30 transition-all duration-300 text-center">
+                                    AccÃ©der au tableau de bord
                                     <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
                                     </svg>
                                 </a>
                             @else
-                                <a href="{{ route("login") }}" class="inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-semibold hover:shadow-xl hover:shadow-blue-500/30 transition-all duration-300 text-center">
-                                    Commencer maintenant
+                                <a href="{{ route('login') }}" class="inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-semibold hover:shadow-xl hover:shadow-blue-500/30 transition-all duration-300 text-center">
+                                    Connectez-vous
                                     <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
                                     </svg>
                                 </a>
                             @endauth
                         @endif
-                        <a href="#features" class="inline-flex items-center justify-center px-8 py-4 border-2 border-gray-200 text-gray-700 rounded-xl font-semibold hover:border-blue-600 hover:text-blue-600 transition-all duration-300 text-center">
-                            En savoir plus
-                        </a>
+
                     </div>
                 </div>
                 <div class="relative">
@@ -104,8 +99,7 @@
                                     </svg>
                                 </div>
                                 <div>
-                                    <p class="font-semibold text-gray-900">Pointage réussi</p>
-                                    <p class="text-sm text-gray-600">Jean Dupont - 08:45</p>
+                                    <p class="font-semibold text-gray-900">Pointage rÃ©ussi</p>
                                 </div>
                             </div>
                             <div class="flex items-center gap-4 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl">
@@ -116,7 +110,6 @@
                                 </div>
                                 <div>
                                     <p class="font-semibold text-gray-900">QR Code actif</p>
-                                    <p class="text-sm text-gray-600">Token: A3F7-K9L2</p>
                                 </div>
                             </div>
                             <div class="flex items-center gap-4 p-4 bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl">
@@ -126,8 +119,7 @@
                                     </svg>
                                 </div>
                                 <div>
-                                    <p class="font-semibold text-gray-900">Demande de congé</p>
-                                    <p class="text-sm text-gray-600">3 demandes en attente</p>
+                                    <p class="font-semibold text-gray-900">Demande de congÃ©</p>
                                 </div>
                             </div>
                         </div>
@@ -141,8 +133,8 @@
     <section id="features" class="py-20 bg-white">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-16">
-                <h2 class="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">Fonctionnalités principales</h2>
-                <p class="text-lg text-gray-600 max-w-2xl mx-auto">Découvrez comment notre système simplifie la gestion des présences</p>
+                <h2 class="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">FonctionnalitÃ©s principales</h2>
+                <p class="text-lg text-gray-600 max-w-2xl mx-auto">DÃ©couvrez comment notre systÃ¨me simplifie la gestion des prÃ©sences</p>
             </div>
             <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                 <div class="group p-8 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl hover:shadow-xl transition-all duration-300 border border-blue-100">
@@ -152,7 +144,7 @@
                         </svg>
                     </div>
                     <h3 class="text-xl font-bold text-gray-900 mb-3">Pointage QR Code</h3>
-                    <p class="text-gray-600">Système de pointage sécurisé via QR code dynamique qui change toutes les minutes pour une sécurité maximale.</p>
+                    <p class="text-gray-600">SystÃ¨me de pointage sÃ©curisÃ© via QR code dynamique qui change toutes les minutes pour une sÃ©curitÃ© maximale.</p>
                 </div>
                 <div class="group p-8 bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl hover:shadow-xl transition-all duration-300 border border-green-100">
                     <div class="w-14 h-14 bg-gradient-to-br from-green-600 to-emerald-600 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
@@ -161,7 +153,7 @@
                         </svg>
                     </div>
                     <h3 class="text-xl font-bold text-gray-900 mb-3">Tableau de bord</h3>
-                    <p class="text-gray-600">Interface intuitive pour visualiser les statistiques de présence et les performances de l\"équipe en temps réel.</p>
+                    <p class="text-gray-600">Interface intuitive pour visualiser les statistiques de prÃ©sence et les performances de l\"quipe en temps rel.</p>
                 </div>
                 <div class="group p-8 bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl hover:shadow-xl transition-all duration-300 border border-purple-100">
                     <div class="w-14 h-14 bg-gradient-to-br from-purple-600 to-pink-600 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
@@ -169,8 +161,8 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                         </svg>
                     </div>
-                    <h3 class="text-xl font-bold text-gray-900 mb-3">Gestion des congés</h3>
-                    <p class="text-gray-600">Système complet de demande et d\"approbation des congés avec suivi des soldes et historique.</p>
+                    <h3 class="text-xl font-bold text-gray-900 mb-3">Gestion des congÃ©s</h3>
+                    <p class="text-gray-600">SystÃ¨me complet de demande et d\"approbation des congÃ©s avec suivi des soldes et historique.</p>
                 </div>
                 <div class="group p-8 bg-gradient-to-br from-orange-50 to-amber-50 rounded-2xl hover:shadow-xl transition-all duration-300 border border-orange-100">
                     <div class="w-14 h-14 bg-gradient-to-br from-orange-600 to-amber-600 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
@@ -179,54 +171,13 @@
                         </svg>
                     </div>
                     <h3 class="text-xl font-bold text-gray-900 mb-3">Horaires flexibles</h3>
-                    <p class="text-gray-600">Configuration personnalisée des horaires de travail avec gestion des retards et des absences.</p>
+                    <p class="text-gray-600">Configuration personnalise des horaires de travail avec gestion des retards et des absences.</p>
                 </div>
-                <div class="group p-8 bg-gradient-to-br from-cyan-50 to-teal-50 rounded-2xl hover:shadow-xl transition-all duration-300 border border-cyan-100">
-                    <div class="w-14 h-14 bg-gradient-to-br from-cyan-600 to-teal-600 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                        <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                        </svg>
-                    </div>
-                    <h3 class="text-xl font-bold text-gray-900 mb-3">Rapports détaillés</h3>
-                    <p class="text-gray-600">Export des données de présence en différents formats pour une analyse approfondie et la paie.</p>
-                </div>
-                <div class="group p-8 bg-gradient-to-br from-rose-50 to-red-50 rounded-2xl hover:shadow-xl transition-all duration-300 border border-rose-100">
-                    <div class="w-14 h-14 bg-gradient-to-br from-rose-600 to-red-600 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                        <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
-                        </svg>
-                    </div>
-                    <h3 class="text-xl font-bold text-gray-900 mb-3">Gestion multi-départements</h3>
-                    <p class="text-gray-600">Organisation par départements avec gestion des rôles et des permissions adaptés à chaque équipe.</p>
-                </div>
+
             </div>
         </div>
     </section>
 
-    <!-- CTA Section -->
-    <section class="py-20 bg-gradient-to-br from-blue-600 to-indigo-600">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h2 class="text-3xl sm:text-4xl font-bold text-white mb-4">Prêt à simplifier votre gestion de présence ?</h2>
-            <p class="text-lg text-blue-100 mb-8 max-w-2xl mx-auto">Rejoignez les entreprises qui font confiance à PrésenceApp pour gérer leurs équipes</p>
-            @if (Route::has("login"))
-                @auth
-                    <a href="{{ url("/dashboard") }}" class="inline-flex items-center justify-center px-8 py-4 bg-white text-blue-600 rounded-xl font-semibold hover:shadow-xl transition-all duration-300">
-                        Accéder à votre espace
-                        <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
-                        </svg>
-                    </a>
-                @else
-                    <a href="{{ route("login") }}" class="inline-flex items-center justify-center px-8 py-4 bg-white text-blue-600 rounded-xl font-semibold hover:shadow-xl transition-all duration-300">
-                        Commencer gratuitement
-                        <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
-                        </svg>
-                    </a>
-                @endauth
-            @endif
-        </div>
-    </section>
 
     <!-- Footer -->
     <footer class="bg-gray-900 text-gray-400 py-12">
@@ -238,9 +189,9 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                         </svg>
                     </div>
-                    <span class="text-xl font-bold text-white">PrésenceApp</span>
+                    <span class="text-xl font-bold text-white">PrÃ©senceApp</span>
                 </div>
-                <p class="text-sm">© 2024 PrésenceApp. Tous droits réservés.</p>
+                <p class="text-sm">Â© 2026 PrÃ©senceApp. Tous droits rÃ©servÃ©s.</p>
             </div>
         </div>
     </footer>
