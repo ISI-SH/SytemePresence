@@ -9,6 +9,11 @@ use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\Employee\DashboardController as EmployeeDashboardController;
 use Illuminate\Support\Facades\Route;
 
+// Home page route
+Route::get('/', function () {
+    return view('welcome');
+})->name('home');
+
 Route::get('/login', [AuthController::class, 'index'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->name('login.post');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
