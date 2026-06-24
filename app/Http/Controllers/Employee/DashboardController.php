@@ -20,6 +20,8 @@ class DashboardController extends Controller {
 
         // Vérifie si l'employé a déjà pointé aujourd'hui
         $todayAttendance = $user->todayAttendance();
+        //on recupere les horaires de travail de l'employé pour aujourd'hui
+        // Si l'employé n'a pas d'horaires définis, on utilise des horaires par défaut
         $schedule = $user->department?->todaySchedule();
         if (!$schedule) {
             $schedule = (object) [
@@ -28,18 +30,20 @@ class DashboardController extends Controller {
                 'tolerance_minutes'   => (int) config('attendance.late_tolerance_minutes', 15),
             ];
         }
+        //Verifie qu'un qr code est disponible pour aujourd'hui, sinon en genere un nouveau
         DailyToken::ensureCurrent();
+        //permet d'afficher ou non le bouton scanner
         $hasToken        = DailyToken::current() !== null;
         $history         = $user->attendances()->orderBy('date', 'desc')->limit(30)->get();
-        $monthStats      = $user->attendances()
+        $monthStats      = $user->attendances()//calcul des statistiques du mois en cours
             ->whereMonth('date', now()->month)->whereYear('date', now()->year)
-            ->selectRaw("COUNT(*) AS total, SUM(status='present') AS present,
+            ->selectRaw("COUNT(*) AS total, SUM(status='present') AS present,//Compte le nombre de pointages avec le statut 'present'
                          SUM(status='late') AS late, SUM(status='absent') AS absent,
                          SUM(status='early_departure') AS early_departure,
-                         ROUND(AVG(CASE WHEN hours_worked IS NOT NULL THEN hours_worked END)/60,1) AS avg_hours")
+                         ROUND(AVG(CASE WHEN hours_worked IS NOT NULL THEN hours_worked END)/60,1) AS avg_hours")//Calcul de la moyenne des heures travaillées en minutes, puis conversion en heures avec une décimale
             ->first();
 
-        // Nombre de demandes de congé en attente
+        //Compte le nombre de demandes de congé en attente
         $pendingLeaves = $user->leaveRequests()->where('status', 'pending')->count();
 
         // Envoie toutes les données vers la vue dashboard employé
@@ -60,7 +64,7 @@ class DashboardController extends Controller {
         return redirect()->route('employee.dashboard')
             ->with($result['success'] ? 'success' : 'error', $result['message']);
     }
-
+    // Enregistre le départ d'un employé
     public function checkOut(Request $request) {
         $request->validate(['token' => 'required|string']);
         $result = $this->attendanceService->checkOut(Auth::user(), $request->token);
@@ -85,7 +89,7 @@ class DashboardController extends Controller {
                   ->whereMonth('date', $month);
         }
 
-        // Pagination de l'historique
+        // Pagination de l'historique affiche 15 elements par page
         return view('employee.history', [
             'attendances' => $query->paginate(15)->withQueryString()
         ]);
@@ -95,6 +99,7 @@ class DashboardController extends Controller {
 
         // Affiche la liste des demandes de congé de l'employé
         return view('employee.leaves.index', [
+            //tri du plus recent au plus ancien
             'leaves' => Auth::user()->leaveRequests()
                 ->orderBy('created_at','desc')
                 ->paginate(10)
