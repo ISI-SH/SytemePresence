@@ -103,60 +103,12 @@
             </div>
         </div>
 
-        <!-- Graphique des tendances -->
-        <div class="bg-white overflow-hidden shadow rounded-lg mb-8">
-            <div class="p-5">
-                <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Tendances de présence (7 derniers jours)</h3>
-                <div class="h-64">
-                    <canvas id="attendanceChart"></canvas>
-                </div>
-            </div>
-        </div>
+        
+       
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-    const ctx = document.getElementById('attendanceChart').getContext('2d');
-    const attendanceChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: @json(collect($last7Days)->pluck('date')),
-            datasets: [
-                {
-                    label: 'Présents',
-                    data: @json(collect($last7Days)->pluck('present')),
-                    borderColor: 'rgb(34, 197, 94)',
-                    backgroundColor: 'rgba(34, 197, 94, 0.1)',
-                    tension: 0.1
-                },
-                {
-                    label: 'Retards',
-                    data: @json(collect($last7Days)->pluck('late')),
-                    borderColor: 'rgb(234, 179, 8)',
-                    backgroundColor: 'rgba(234, 179, 8, 0.1)',
-                    tension: 0.1
-                },
-                {
-                    label: 'Absents',
-                    data: @json(collect($last7Days)->pluck('absent')),
-                    borderColor: 'rgb(239, 68, 68)',
-                    backgroundColor: 'rgba(239, 68, 68, 0.1)',
-                    tension: 0.1
-                }
-            ]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                y: {
-                    beginAtZero: true
-                }
-            }
-        }
-    });
-</script>
+
 <script>
 (function () {
     const qrImage = document.getElementById('admin-qr-image');
