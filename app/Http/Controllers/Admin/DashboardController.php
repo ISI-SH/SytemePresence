@@ -108,23 +108,7 @@ class DashboardController extends Controller
             ? round(($actualAttendance / $totalPossibleAttendance) * 100, 2) 
             : 0;
 
-        $last7Days = [];
-        for ($i = 6; $i >= 0; $i--) {
-            $date = Carbon::now()->subDays($i);
-            $last7Days[] = [
-                'date' => $date->format('d/m'),
-                'present' => Attendance::whereDate('date', $date)
-                    ->where('status', 'present')
-                    ->count(),
-                'late' => Attendance::whereDate('date', $date)
-                    ->where('status', 'late')
-                    ->count(),
-                'absent' => $totalActiveEmployees - Attendance::whereDate('date', $date)
-                    ->whereIn('status', $presentStatuses)
-                    ->distinct('user_id')
-                    ->count('user_id')
-            ];
-        }
+     
 
         $qrCode = DailyToken::ensureCurrent();
         $qrCodeSvg = null;
@@ -140,7 +124,6 @@ class DashboardController extends Controller
             'presencesData',
             'weeklyGlobalRates',
             'weeklyAttendanceRate',
-            'last7Days',
             'qrCode',
             'qrCodeSvg'
         ));
