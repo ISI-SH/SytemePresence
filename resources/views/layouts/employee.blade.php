@@ -1,24 +1,45 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', 'PrésenceApp')</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter','sans-serif'] } } } }</script>
-    <style>
-        .badge-present { @apply inline-flex px-2.5 py-0.5 rounded-full text-xs font-semibold bg-green-100 text-green-800; }
-        .badge-late    { @apply inline-flex px-2.5 py-0.5 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-800; }
-        .badge-early   { @apply inline-flex px-2.5 py-0.5 rounded-full text-xs font-semibold bg-orange-100 text-orange-800; }
-        .badge-absent  { @apply inline-flex px-2.5 py-0.5 rounded-full text-xs font-semibold bg-red-100 text-red-800; }
-        .badge-default { @apply inline-flex px-2.5 py-0.5 rounded-full text-xs font-semibold bg-gray-100 text-gray-600; }
-        .badge-pending { @apply inline-flex px-2.5 py-0.5 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-800; }
-    </style>
-</head>
-<body class="bg-gray-50 font-sans antialiased">
+<!-- Layout principal de l'espace employé -->
+
+<!-- Encodage UTF-8 -->
+<meta charset="UTF-8">
+
+<!-- Adaptation aux écrans mobiles -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- Token de sécurité CSRF utilisé par Laravel -->
+<meta name="csrf-token" content="{{ csrf_token() }}">
+
+<!-- Titre dynamique de la page -->
+<title>@yield('title', 'PrésenceApp')</title>
+
+<!-- Import de la police Inter -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+
+<!-- Import de Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com"></script>
+
+<!-- Classes CSS utilisées pour afficher les différents statuts -->
+<style>
+    /* Présent */
+    .badge-present
+
+    /* Retard */
+    .badge-late
+
+    /* Départ anticipé */
+    .badge-early
+
+    /* Absent */
+    .badge-absent
+
+    /* Statut par défaut */
+    .badge-default
+
+    /* Demande en attente */
+    .badge-pending
+</style>
+
+<!-- Conteneur principal -->
 <div class="flex h-screen overflow-hidden">
 
     <!-- MOBILE MENU BUTTON -->
@@ -42,64 +63,54 @@
             </div>
             <span class="text-white font-bold text-base">PrésenceApp</span>
         </div>
-        <!-- User -->
-        <div class="flex items-center gap-3 px-6 py-4 border-b border-slate-700">
-            <div class="w-9 h-9 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold text-sm">
-                {{ strtoupper(substr(auth()->user()->name, 0, 2)) }}
-            </div>
-            <div class="min-w-0">
-                <p class="text-sm font-semibold text-white truncate">{{ auth()->user()->name }}</p>
-                <p class="text-xs text-slate-400 truncate">{{ auth()->user()->department?->name ?? 'Sans département' }}</p>
-            </div>
+
+        <!-- Informations de l'employé connecté -->
+        <div>
+
+            <!-- Initiales de l'employé -->
+            {{ strtoupper(substr(auth()->user()->name, 0, 2)) }}
+
+            <!-- Nom complet -->
+            {{ auth()->user()->name }}
+
+            <!-- Département -->
+            {{ auth()->user()->department?->name ?? 'Sans département' }}
         </div>
-        <!-- Nav -->
-        <nav class="flex-1 px-3 py-4 space-y-1">
-            <a href="{{ route('employee.dashboard') }}"
-               class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors
-                      {{ request()->routeIs('employee.dashboard') ? 'bg-blue-600 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                          d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0h6"/>
-                </svg>
+
+        <!-- Menu de navigation -->
+        <nav>
+
+            <!-- Lien vers le tableau de bord -->
+            <a href="{{ route('employee.dashboard') }}">
                 Tableau de bord
             </a>
-            <a href="{{ route('employee.history') }}"
-               class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors
-                      {{ request()->routeIs('employee.history') ? 'bg-blue-600 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                          d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
-                </svg>
+
+            <!-- Lien vers l'historique -->
+            <a href="{{ route('employee.history') }}">
                 Mon historique
             </a>
-            <a href="{{ route('employee.leaves.index') }}"
-               class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors
-                      {{ request()->routeIs('employee.leaves.*') ? 'bg-blue-600 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                          d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                </svg>
+
+            <!-- Lien vers les demandes de congé -->
+            <a href="{{ route('employee.leaves.index') }}">
                 Mes congés
             </a>
+
         </nav>
-        <!-- Logout -->
-        <div class="px-3 pb-4 pt-4 border-t border-slate-700">
-            <form method="POST" action="{{ route('logout') }}">
-                @csrf
-                <button type="submit"
-                        class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium
-                               text-slate-400 hover:bg-red-900/30 hover:text-red-400 transition-colors">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
-                    </svg>
-                    Se déconnecter
-                </button>
-            </form>
-        </div>
+
+        <!-- Formulaire de déconnexion -->
+        <form method="POST" action="{{ route('logout') }}">
+
+            <!-- Protection CSRF -->
+            @csrf
+
+            <!-- Bouton de déconnexion -->
+            Se déconnecter
+
+        </form>
+
     </aside>
 
-    <!-- MAIN -->
+    <!-- Zone principale -->
     <div class="flex-1 flex flex-col overflow-hidden">
         <!-- Header -->
         <header class="bg-white border-b border-gray-200 px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between flex-shrink-0">
@@ -135,8 +146,11 @@
         <!-- Content -->
         <main class="flex-1 overflow-y-auto px-4 sm:px-6 lg:px-8 py-6">
             @yield('content')
+
         </main>
+
     </div>
+
 </div>
 
 <script>
