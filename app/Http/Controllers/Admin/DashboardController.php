@@ -30,7 +30,7 @@ class DashboardController extends Controller
     public function index()
     {
         $today = Carbon::today();
-        $employeeRoles = $this->employeeRoles();
+        $employeeRoles = $this->employeeRoles(); //  
         $attendanceStatuses = ['present', 'late', 'early_departure'];
         $presentStatuses = ['present', 'late'];
 
@@ -46,17 +46,17 @@ class DashboardController extends Controller
             ->where('is_active', true)
             ->count();
 
-        $absentCount = $totalActiveEmployees - Attendance::whereDate('date', $today)
+        $absentCount = $totalActiveEmployees - Attendance::whereDate('date', $today) // les absents de la journée en tenant compte inactifs 
             ->whereIn('status', $attendanceStatuses)
             ->distinct('user_id')
             ->count('user_id');
 
-        $avgHours = Attendance::whereDate('date', $today)
+        $avgHours = Attendance::whereDate('date', $today) //pour calculer les heures moyennes de travail de la journée
             ->whereNotNull('hours_worked')
             ->avg('hours_worked');
         $avgHours = $avgHours ? round($avgHours / 60, 2) : 0;
 
-        $employees = User::whereIn('role', $employeeRoles)
+        $employees = User::whereIn('role', $employeeRoles) //employé active
             ->where('is_active', true)
             ->get();
 
